@@ -12,6 +12,7 @@ import java.util.function.BinaryOperator;
  * 本节将介绍如何使用Lambda表达式简化匿名内部类的书写，
  * 但Lambda表达式并不能取代所有的匿名内部类，只能用来取代函数接口（Functional Interface）的简写。
  * 先别在乎细节，看几个例子再说。
+ * TODO: lambda中的类型推倒方法
  */
 public class LambdaExample {
     public static void main(String[] args) {

@@ -14,6 +14,7 @@
         <module>http-sender</module>
         <module>collection</module>
         <module>lambda</module>
+        <module>stream</module>
     </modules>
 
     <dependencies>
