@@ -42,6 +42,7 @@ System.out.println(longest.get());
 当然可以使用Stream.max(Comparator<? super T> comparator)方法来达到同等效果，但reduce()自有其存在的理由。
 
 ![示例1](images/reduce_parameter.png)
+
 需求：求出一组单词的长度之和。这是个“求和”操作，操作对象输入类型是String，而结果类型是Integer。
 ```java
 Stream<String> stream = Stream.of("I", "love", "you", "too");
