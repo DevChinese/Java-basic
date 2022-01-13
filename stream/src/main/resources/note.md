@@ -84,4 +84,56 @@ public static void collectExample() {
   set.forEach(System.out::println);
 }
 ```
+## 接口的静态方法和默认方法
+Function是一个接口，那么Function.identity()是什么意思呢？这要从两方面解释：
+- Java 8允许在接口中加入具体方法。接口中的具体方法有两种，default方法和static方法，identity()就是Function接口的一个静态方法。
+- Function.identity()返回一个输出跟输入一样的Lambda表达式对象，等价于形如t -> t形式的Lambda表达式。
+上面的解释是不是让你疑问更多？不要问我为什么接口中可以有具体方法，也不要告诉我你觉得t -> t比identity()方法更直观。
+我会告诉你接口中的default方法是一个无奈之举，在Java 7及之前要想在定义好的接口中加入新的抽象方法是很困难甚至不可能的，
+因为所有实现了该接口的类都要重新实现。试想在Collection接口中加入一个stream()抽象方法会怎样？
+default方法就是用来解决这个尴尬问题的，直接在接口中实现新加入的方法。
+既然已经引入了default方法，为何不再加入static方法来避免专门的工具类呢
 
+## 方法引用
+诸如`String::length`的语法形式叫做方法引用（method references），这种语法用来替代某些特定形式Lambda表达式。
+如果Lambda表达式的全部内容就是调用一个已有的方法，那么可以用方法引用来替代Lambda表达式。方法引用可以细分为四类：
+![方法引用](images/method_import.png)
+
+## 收集器
+![收集器](images/collect_parameter.png)
+收集器（Collector）是为Stream.collect()方法量身打造的工具接口（类）。
+考虑一下将一个Stream转换成一个容器（或者Map）需要做哪些工作？我们至少需要知道：
+- 目标容器是什么？是ArrayList还是HashSet，或者是个TreeMap。
+- 新元素如何添加到容器中？是List.add()还是Map.put()。
+- 另外如果并行的进行规约，还需要告诉collect() 多个部分结果如何合并成一个。
+
+结合以上分析，collect()方法定义为<R> R collect(Supplier<R> supplier, BiConsumer<R,? super T> accumulator, BiConsumer<R,R> combiner)
+三个参数依次对应上述三条分析。不过每次调用collect()都要传入这三个参数太麻烦，收集器Collector就是对这三个参数的简单封装,
+所以collect()的另一定义为<R,A> R collect(Collector<? super T,A,R> collector)。
+Collectors工具类可通过静态方法生成各种常用的Collector。举例来说，如果要将Stream规约成List可以通过如下两种方式实现：
+```java
+//　将Stream规约成List
+Stream<String> stream = Stream.of("I", "love", "you", "too");
+List<String> list = stream.collect(ArrayList::new, ArrayList::add, ArrayList::addAll);// 方式１
+//List<String> list = stream.collect(Collectors.toList());// 方式2
+System.out.println(list);
+```
+通常情况下我们不需要手动指定collect()的三个参数，而是调用collect(Collector<? super T,A,R> collector)方法，
+并且参数中的Collector对象大都是直接通过Collectors工具类获得。实际上传入的收集器的行为决定了collect()的行为。
+
+### 使用collect()生成Collection
+前面已经提到通过collect()方法将Stream转换成容器的方法，这里再汇总一下。
+将Stream转换成List或Set是比较常见的操作，所以Collectors工具已经为我们提供了对应的收集器，通过如下代码即可完成：
+```java
+// 将Stream转换成List或Set
+Stream<String> stream = Stream.of("I", "love", "you", "too");
+List<String> list = stream.collect(Collectors.toList()); // (1)
+Set<String> set = stream.collect(Collectors.toSet()); // (2)
+```
+上述代码能够满足大部分需求，但由于返回结果是接口类型，我们并不知道类库实际选择的容器类型是什么，
+有时候我们可能会想要人为指定容器的实际类型，这个需求可通过Collectors.toCollection(Supplier<C> collectionFactory)方法完成。
+```java
+// 使用toCollection()指定规约容器的类型
+ArrayList<String> arrayList = stream.collect(Collectors.toCollection(ArrayList::new));// (3)
+HashSet<String> hashSet = stream.collect(Collectors.toCollection(HashSet::new));// (4)
+```
