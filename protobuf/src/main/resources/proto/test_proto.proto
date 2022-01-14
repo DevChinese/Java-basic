@@ -22,7 +22,7 @@ option java_package = "com.hua.proto";
 // 该字段是option的，用于指定proto文件生成的java类的outerclass类名。
 // 什么是outerclass？简单来说就是用一个class文件来定义所有的message对应的java类。
 // 这个class就是outerclass；如果没有指定，默认是proto文件的驼峰式
-option java_outer_classname = "TestServer";
+option java_outer_classname = "TestProto";
 
 // 该字段是option的，如果是true，那么每一个message文件都会有一个单独的class文件；否则，message全部定义在outerclass文件里。
 // option java_multiple_files = true;
@@ -38,6 +38,6 @@ message Response {
     string msg = 3;
 }
 
-service TestService {
-    rpc Service1 (Response) returns (Response);
-}
+ service TestService {
+    rpc service1 (Response) returns (Response);
+ }
