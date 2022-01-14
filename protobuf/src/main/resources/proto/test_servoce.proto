@@ -1,0 +1,43 @@
+// 使用 proto3 语法 ,未指定则使用proto2
+
+syntax = "proto3";  // proto语句后需要加分号
+
+// 生成 proto 文件所在包路径，这个包会作为服务名的前缀
+// 定义message的包名。包名的含义与平台语言无关，这个package仅仅被用在proto文件中用于区分同名的message类型。
+// 可以理解为message全名的前缀，和message名合起来唯一标识一个message类型。比如com.user.User与com.company.User就是两个message类型。
+// 在proto文件中导入其他proto文件的message，需要加上package前缀才行。所以包名是用来唯一标识message的；
+// 这个包名与proto文件所在的路径没有关系，包名为com.user，不代表必须在com/user目录下；
+// 2.proto文件本身的路径：
+// 该路径会影响proto文件import其他文件。
+// 比如a.proto在com/user目录下，那么其他proto想要import该文件时，需要import "com/user/a.proto"。
+// 也就是说import关键字后面的路径是被import的proto文件的路径，与package没有任何关系！
+package my_proto;
+
+// 这个选项表明生成java类所在的包
+// 该字段是option的，用于标识生成的java文件的package。
+// 如果没有指定，则使用proto里定义的package，如果package也没有指定，那就会生成在根目录下；
+option java_package = "com.hua.proto";
+
+// 生成 proto 文件名
+// 该字段是option的，用于指定proto文件生成的java类的outerclass类名。
+// 什么是outerclass？简单来说就是用一个class文件来定义所有的message对应的java类。
+// 这个class就是outerclass；如果没有指定，默认是proto文件的驼峰式
+option java_outer_classname = "TestServer";
+
+// 该字段是option的，如果是true，那么每一个message文件都会有一个单独的class文件；否则，message全部定义在outerclass文件里。
+// option java_multiple_files = true;
+
+message Request {
+    int32 msg_no = 1;
+    string msg = 2;
+}
+
+message Response {
+    int32 msg_no = 1;
+    int32 code = 2;
+    string msg = 3;
+}
+
+service TestService {
+    rpc Service1 (Response) returns (Response);
+}

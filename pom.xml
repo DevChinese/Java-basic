@@ -15,6 +15,7 @@
         <module>collection</module>
         <module>lambda</module>
         <module>stream</module>
+        <module>protobuf</module>
     </modules>
 
     <dependencies>
