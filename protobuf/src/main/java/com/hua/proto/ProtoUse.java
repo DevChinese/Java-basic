@@ -5,12 +5,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ProtoUse {
     public static void main(String[] args) throws InvalidProtocolBufferException {
-        TestServer.Request.Builder builder = TestServer.Request.newBuilder();
+        TestProto.Request.Builder builder = TestProto.Request.newBuilder();
 
         builder.setMsgNo(1);
         builder.setMsg("hahaha");
 
-        TestServer.Request request = builder.build();
+        TestProto.Request request = builder.build();
 
         // 对象转换正常byte数组
         byte[] requestBytes =  request.toByteArray();
@@ -19,7 +19,7 @@ public class ProtoUse {
         System.out.println(requestBytes.length);
 
         // byte数组转换成为对象
-        TestServer.Request request2 = TestServer.Request.parseFrom(requestBytes);
+        TestProto.Request request2 = TestProto.Request.parseFrom(requestBytes);
         System.out.println(request2.getMsg());
 
     }
