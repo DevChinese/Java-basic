@@ -14,7 +14,7 @@
         <module>lambda</module>
         <module>stream</module>
         <module>protobuf</module>
-        <module>consistency-hash</module>
+        <module>consistent-hash</module>
   </modules>
 
     <dependencies>
