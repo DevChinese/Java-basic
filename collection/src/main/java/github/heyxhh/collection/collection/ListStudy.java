@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * @Description: 主要涉及List的内容
@@ -43,7 +44,7 @@ public class ListStudy {
     }
 
     public static void retieveLinkedList() {
-        List<Integer> linkedList = new LinkedList<Integer>();
+        LinkedList<Integer> linkedList = new LinkedList<Integer>();
         linkedList.add(2);
         linkedList.add(3);
 

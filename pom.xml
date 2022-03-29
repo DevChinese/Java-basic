@@ -15,6 +15,7 @@
         <module>stream</module>
         <module>protobuf</module>
         <module>consistent-hash</module>
+    <module>concurrency</module>
   </modules>
 
     <dependencies>

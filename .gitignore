@@ -2,3 +2,5 @@
 .vscode/
 target/
 .DS_Store
+
+.atp_generated_tests/

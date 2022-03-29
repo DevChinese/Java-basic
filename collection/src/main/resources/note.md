@@ -1,3 +1,7 @@
+# 基本结构
+![Collection结构](./images/collection_struct.jpeg)
+![Map结构](./images/map_struct.jpeg)
+
 # 迭代器
 
 为了方便的处理集合中的元素,Java中出现了一个对象,该对象提供了一些方法专门处理集合中的元素.例如删除和获取集合中的元素.该对象就叫做迭代器(Iterator).
