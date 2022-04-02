@@ -3,4 +3,6 @@
 target/
 .DS_Store
 
+*.iml
+
 .atp_generated_tests/
