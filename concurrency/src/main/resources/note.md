@@ -435,13 +435,13 @@ private static int ctlOf(int rs, int wc) { return rs | wc; }
 2) 构造方法
 ```java
 public ThreadPoolExecutor(
-        int corePoolSize,  // 核心线程数目 (最多保留的线程数)
-        int maximumPoolSize,  // 最大线程数目，核心线程数目 + 救急线程数目
-        long keepAliveTime,  // 生存时间 - 针对救急线程
-        TimeUnit unit,  // 针对救急线程
-        BlockingQueue<Runnable> workQueue,  // 阻塞队列
-        ThreadFactory threadFactory,  // 线程工厂 - 可以为线程创建时起个好名字
-        RejectedExecutionHandler handler  //  拒绝策略
+    int corePoolSize,  // 核心线程数目 (最多保留的线程数)
+    int maximumPoolSize,  // 最大线程数目，核心线程数目 + 救急线程数目
+    long keepAliveTime,  // 生存时间 - 针对救急线程
+    TimeUnit unit,  // 针对救急线程
+    BlockingQueue<Runnable> workQueue,  // 阻塞队列
+    ThreadFactory threadFactory,  // 线程工厂 - 可以为线程创建时起个好名字
+    RejectedExecutionHandler handler  //  拒绝策略
 )
 ```
 工作方式:
@@ -462,7 +462,60 @@ public ThreadPoolExecutor(
 
 根据这个构造方法，JDK Executors 类中提供了众多工厂方法来创建各种用途的线程池。
 
+3) newFixedThreadPool
+```java
+public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
+    return new ThreadPoolExecutor(nThreads, nThreads,
+                                  0L, TimeUnit.MILLISECONDS,
+                                  new LinkedBlockingQueue<Runnable>(),
+                                  threadFactory);
+}
+```
+特点:
+- 核心线程数 == 最大线程数(没有救急线程被创建)，因此也无需超时时间
+- 阻塞队列是无界的，可以放任意数量的任务
+- 适用于任务量已知，相对耗时的任务
 
+4) newCachedThreadPool
+```java
+public static ExecutorService newCachedThreadPool() {
+    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                                  60L, TimeUnit.SECONDS,
+                                  new SynchronousQueue<Runnable>());
+}
+```
+特点:
+- 核心线程数是 0， 最大线程数是 Integer.MAX_VALUE，救急线程的空闲生存时间是 60s，意味着
+  - 全部都是救急线程(60s 后可以回收)
+  - 救急线程可以无限创建
+- 队列采用了 SynchronousQueue 实现特点是，它没有容量，每次插入数据时若无线程来取走，就会被阻塞
+```java
+SynchronousQueue<Integer> queue = new SynchronousQueue<>();
+
+queue.put(1); // 若 1 没被取走，后续无法往里面存放数据
+
+System.out.println("数据1被取走");  // 没执行到
+
+queue.put(2);
+```
+- 整个线程池表现为线程数会根据任务量不断增长，没有上限，当任务执行完毕，空闲1分钟后释放线程。适合任务数比较密集，但每个任务执行时间较短的情况。
+
+5) newSingleThreadExecutor
+```java
+public static ExecutorService newSingleThreadExecutor() {
+    return new FinalizableDelegatedExecutorService
+        (new ThreadPoolExecutor(1, 1,
+                                0L, TimeUnit.MILLISECONDS,
+                                new LinkedBlockingQueue<Runnable>()));
+}
+```
+使用场景:
+希望多个任务排队执行。线程数固定为 1，任务数多于 1 时，会放入无界队列排队。任务执行完毕，这唯一的线程也不会被释放。
+区别:
+- 自己创建一个单线程串行执行任务，如果任务执行失败而终止那么没有任何补救措施。而线程池中的一个任务失败了，还会新建一个线程，保证池的正常工作，不影响其他任务执行。
+- Executors.newSingleThreadExecutor() 线程个数始终为1，不能修改。FinalizableDelegatedExecutorService 应用的是装饰器模式，只对外暴露了 ExecutorService 接口，因
+  此不能调用 ThreadPoolExecutor 中特有的方法
+- Executors.newFixedThreadPool(1) 初始时为1，以后还可以修改。对外暴露的是 ThreadPoolExecutor 对象，可以强转后调用 setCorePoolSize 等方法进行修改。
 
 
 
